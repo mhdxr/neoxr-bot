@@ -14,23 +14,23 @@ module.exports = async (client, ctx) => {
    try {
       // "InvCloud" reduces RAM usage and minimizes errors during rewrite (according to recommendations/suggestions from Baileys)
       require('./lib/system/schema')(m, env), InvCloud(store)
-      const groupSet = global.db.groups.find(v => v.jid === m.chat)
-      const chats = global.db.chats.find(v => v.jid === m.chat)
-      const users = global.db.users.find(v => v.jid === m.sender)
-      const setting = global.db.setting
-      const isOwner = [client.decodeJid(client.user.id).replace(/@.+/, ''), env.owner, ...setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
-      const isPrem = users && users.premium || isOwner
-      const groupMetadata = m.isGroup ? await Func.getGroupMetadata(m.chat, client) : {}
-      const participants = m.isGroup ? groupMetadata ? groupMetadata.participants : [] : [] || []
-      const adminList = m.isGroup ? await client.groupAdmin(m.chat) : [] || []
-      const isAdmin = m.isGroup ? adminList.includes(m.sender) : false
-      const isBotAdmin = m.isGroup ? adminList.includes((client.user.id.split`:`[0]) + '@s.whatsapp.net') : false
-      const blockList = typeof await (await client.fetchBlocklist()) != 'undefined' ? await (await client.fetchBlocklist()) : []
+      let groupSet = global.db.groups.find(v => v.jid === m.chat)
+      let chats = global.db.chats.find(v => v.jid === m.chat)
+      let users = global.db.users.find(v => v.jid === m.sender)
+      let setting = global.db.setting
+      let isOwner = [client.decodeJid(client.user.id).replace(/@.+/, ''), env.owner, ...setting.owners].map(v => v + '@s.whatsapp.net').includes(m.sender)
+      let isPrem = users && users.premium || isOwner
+      let groupMetadata = m.isGroup ? await client.getGroupMetadata(m.chat) : {}
+      let participants = m.isGroup ? groupMetadata ? groupMetadata.participants : [] : [] || []
+      let adminList = m.isGroup ? await client.groupAdmin(m.chat) : [] || []
+      let isAdmin = m.isGroup ? adminList.includes(m.sender) : false
+      let isBotAdmin = m.isGroup ? adminList.includes((client.user.id.split`:`[0]) + '@s.whatsapp.net') : false
+      let blockList = typeof await (await client.fetchBlocklist()) != 'undefined' ? await (await client.fetchBlocklist()) : []
+
       const isSpam = spam.detection(client, m, {
          prefix, command, commands, users, cooldown,
-         show: 'all', // choose 'all' or 'command-only'
-         banned_times: users.ban_times,
-         simple: false
+         show: 'all', // options: 'all' | 'command-only' | 'message-only' | 'spam-only'| 'none'
+         banned_times: users.ban_times
       })
 
       // exception disabled plugin
@@ -150,9 +150,6 @@ module.exports = async (client, ctx) => {
             }
             if (!['me', 'owner', 'exec'].includes(name) && users && (users.banned || new Date - users.ban_temporary < env.timeout)) continue
             if (m.isGroup && !['activation', 'groupinfo'].includes(name) && groupSet.mute) continue
-            if (cmd.cache && cmd.location) {
-               Func.updateFile(cmd.location)
-            }
             if (cmd.owner && !isOwner) {
                client.reply(m.chat, global.status.owner, m)
                continue
@@ -213,9 +210,6 @@ module.exports = async (client, ctx) => {
                thumbnail: await Func.fetchBuffer('https://telegra.ph/file/0b32e0a0bb3b81fef9838.jpg'),
                url: setting.link
             }).then(() => chats.lastchat = new Date() * 1)
-            if (event.cache && event.location) {
-               Func.updateFile(event.location)
-            }
             if (event.error) continue
             if (event.owner && !isOwner) continue
             if (event.group && !m.isGroup) continue
