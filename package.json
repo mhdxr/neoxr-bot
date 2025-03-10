@@ -4,8 +4,7 @@
    "description": "WhatsApp Bot (Base)",
    "main": "index.js",
    "engines": {
-      "node": ">= 18.x",
-      "npm": ">= 9.x"
+      "node": ">= 20.x"
    },
    "scripts": {
       "start": "node ."
@@ -25,16 +24,17 @@
    },
    "homepage": "https://github.com/neoxr/neoxr-bot#readme",
    "dependencies": {
-      "@adiwajshing/baileys": "npm:@neoxr/baileys@7.6.3",
+      "@adiwajshing/baileys": "npm:@neoxr/baileys@7.6.9",
       "@adiwajshing/keyed-db": "^0.2.4",
       "@colors/colors": "^1.6.0",
-      "@neoxr/wb": "^4.7.8",
+      "@neoxr/wb": "^4.7.11",
       "@neoxr/youtube-scraper": "^3.1.5",
       "bytes": "^3.1.2",
       "cfonts": "3.1.1",
       "express": "~4.16.4",
       "jimp": "^0.22.12",
       "json-stable-stringify": "^1.0.2",
+      "libsignal": "github:WhiskeySockets/libsignal-node",
       "node-cron": "^3.0.0",
       "node-gtts": "^2.0.2",
       "qrcode": "1.5.0",
